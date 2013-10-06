@@ -3,7 +3,7 @@ import sys, time, requests, subprocess
 
 def main(argv):
   if len(argv) < 2:
-    print "Usage sbn.py API_TOKEN"
+    print "Usage sbn.py YOUR_SLUSH_API_TOKEN"
     return
 
   token = argv[1]
@@ -13,14 +13,20 @@ def main(argv):
   while True:
     r = requests.get(url)
     data = r.json()
-    row = data["blocks"].popitem()
-    key = row[0]
-    values = row[1]
+
+    # The rows in the JSON ar not sorted, so we have to handle that
+    row = data["blocks"]
+    blocks = row.keys()
+    blocks.sort()
+    
+    key = blocks[-1]
+    values = row[blocks[-1]]
 
     if last is None:
       last = key
+      print "First: %s" %values
     elif last != key:
-      msg = "xx@%s<br />Duration: %s<br />Reward: %s" %(values['date_found'], values['mining_duration'], values['reward'])
+      msg = "@%s<br />Duration: %s<br />Reward: %s" %(values['date_found'], values['mining_duration'], values['reward'])
       print msg
       subprocess.Popen(['notify-send', 'New Block found', msg])
 
