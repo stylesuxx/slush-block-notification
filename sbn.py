@@ -1,3 +1,8 @@
+# TODO
+# * add option to display reward. This means the notification comes a little
+#   later since the pool needs some time to calculate the reward
+# * add an option to set the update interval, min should be 60 secs since
+#   api calls are cached for 60 seconds.
 #!/usr/bin/python
 import sys, time, requests, subprocess
 
@@ -26,9 +31,12 @@ def main(argv):
       last = key
       print "First: %s" %values
     elif last != key:
-      msg = "@%s<br />Duration: %s<br />Reward: %s" %(values['date_found'], values['mining_duration'], values['reward'])
-      print msg
-      subprocess.Popen(['notify-send', 'New Block found', msg])
+      print 'changed'
+      if 'reward' in values:
+        last = key
+        msg = "@%s<br />Duration: %s<br />Reward: %s" %(values['date_found'], values['mining_duration'], values['reward'])
+        print msg
+        subprocess.Popen(['notify-send', 'New Block found', msg])
 
     time.sleep(90)
 
