@@ -27,7 +27,7 @@ def main(args):
 
     if status == 401:
       print 'Unauthorized, check your token.'
-      return
+      sys.exit(0)
 
     if status == 200:
       # The rows in the JSON ar not sorted, so we have to handle that
