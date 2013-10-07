@@ -5,6 +5,7 @@ This should work with all all linux distributions that use libnotify, which I th
 
 ##### Dependencies:
 * python
+* python requests
 * libnotify-bin
 * slush pool API token (available on your account page)
 
