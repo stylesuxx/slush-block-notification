@@ -77,7 +77,7 @@ parser.add_argument('-u',
                     metavar = 'SEC',
                     type = int,
                     default = 90,
-                    help = 'The time in seconds between updates.')
+                    help = 'The update interval in seconds.')
 
 signal.signal(signal.SIGINT, signal_handler)
 args = parser.parse_args()
