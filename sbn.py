@@ -1,43 +1,84 @@
-# TODO
-# * add option to display reward. This means the notification comes a little
-#   later since the pool needs some time to calculate the reward
-# * add an option to set the update interval, min should be 60 secs since
-#   api calls are cached for 60 seconds.
 #!/usr/bin/python
-import sys, time, requests, subprocess
+import sys, signal, argparse, time, requests, pynotify
 
-def main(argv):
-  if len(argv) < 2:
-    print "Usage sbn.py YOUR_SLUSH_API_TOKEN"
-    return
+def signal_handler(signal, frame):
+        print 'Exiting...'
+        sys.exit(0)
 
-  token = argv[1]
-  url = "https://mining.bitcoin.cz/stats/json/" + token
+def main(args):
+  token = args.token
+  show_reward = args.reward
+  update = args.update
+  url = 'http://mining.bitcoin.cz/stats/json/' + token
   last = None
+  pynotify.init('SlushBlockNotify')
 
   while True:
-    r = requests.get(url)
-    data = r.json()
+    try:
+      r = requests.get(url)
+      status = r.status_code
+      r.raise_for_status()
+      data = r.json()
+    except requests.exceptions.ConnectionError, e:
+      print 'Connection Error. Retrying in %i seconds' %update
+      status = -2
+    except Exception, e:
+      pass
 
-    # The rows in the JSON ar not sorted, so we have to handle that
-    row = data["blocks"]
-    blocks = row.keys()
-    blocks.sort()
-    
-    key = blocks[-1]
-    values = row[blocks[-1]]
+    if status == 401:
+      print 'Unauthorized, check your token.'
+      return
 
-    if last is None:
-      last = key
-      print "First: %s" %values
-    elif last != key:
-      print 'changed'
-      if 'reward' in values:
-        last = key
-        msg = "@%s<br />Duration: %s<br />Reward: %s" %(values['date_found'], values['mining_duration'], values['reward'])
-        print msg
-        subprocess.Popen(['notify-send', 'New Block found', msg])
+    if status == 200:
+      # The rows in the JSON ar not sorted, so we have to handle that
+      row = data['blocks']
+      blocks = row.keys()
+      blocks.sort()
+      # Get the last blocks NR
+      current = blocks[-1]
+      # Get the last blocks values
+      values = row[blocks[-1]]
 
-    time.sleep(90)
+      if last is None:
+        # First block after the program has started.
+        # Only need the Block NR for further reference.
+        last = current
+      elif last != current:
+        # Set message for newly found block.
+        # This depends on the passed flags via cmd.
+        msg = None
+        if show_reward:
+          if 'reward' in values:
+            msg = 'Time: %s<br />Duration: %s<br />Reward: %s' %(values['date_found'].split()[1], values['mining_duration'], values['reward'])
 
-main(sys.argv)
+        else:
+          msg = 'Time: %s<br />Duration: %s' %(values['date_found'].split()[1], values['mining_duration'])
+
+        if msg:
+          last = current
+          pynotify.Notification( 'New Block found', msg).show()
+
+    time.sleep(update)
+
+parser = argparse.ArgumentParser(description='Display notifications about newly found blocks on slush\'s pool.')
+parser.add_argument('token',
+                    metavar = 'API_TOKEN',
+                    help = 'Slush pool API token. Can be found on your account page.')
+
+parser.add_argument('-r',
+                    '--reward',
+                    dest = 'reward',
+                    action = 'store_true',
+                    help = 'Show reward per block. This will cause the notification to be shown as soon as your reward has been calculated by the pool.')
+
+parser.add_argument('-u',
+                    '--update',
+                    dest = 'update',
+                    metavar = 'SEC',
+                    type = int,
+                    default = 90,
+                    help = 'The time in seconds between updates.')
+
+signal.signal(signal.SIGINT, signal_handler)
+args = parser.parse_args()
+main(args)
