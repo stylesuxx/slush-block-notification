@@ -6,6 +6,7 @@ def signal_handler(signal, frame):
         sys.exit(0)
 
 def main(args):
+  verbose = args.verbose
   token = args.token
   show_reward = args.reward
   update = args.update
@@ -42,6 +43,7 @@ def main(args):
       if last is None:
         # First block after the program has started.
         # Only need the Block NR for further reference.
+        if verbose: print 'First block for reference: %s' %current
         last = current
       elif last != current:
         # Set message for newly found block.
@@ -50,11 +52,13 @@ def main(args):
         if show_reward:
           if 'reward' in values:
             msg = 'Time: %s<br />Duration: %s<br />Reward: %s' %(values['date_found'].split()[1], values['mining_duration'], values['reward'])
-
+          else:
+            if verbose: print 'Waiting for reward to be calculated'
         else:
           msg = 'Time: %s<br />Duration: %s' %(values['date_found'].split()[1], values['mining_duration'])
 
         if msg:
+          if verbose: print 'Displaying notification'
           last = current
           pynotify.Notification( 'New Block found', msg).show()
 
@@ -70,6 +74,12 @@ parser.add_argument('-r',
                     dest = 'reward',
                     action = 'store_true',
                     help = 'Show reward per block. This will cause the notification to be shown as soon as your reward has been calculated by the pool.')
+
+parser.add_argument('-v',
+                    '--verbose',
+                    dest = 'verbose',
+                    action = 'store_true',
+                    help = 'Show verbose information.')
 
 parser.add_argument('-u',
                     '--update',
