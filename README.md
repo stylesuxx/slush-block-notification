@@ -26,6 +26,4 @@ optional arguments:
   --nogui               No GUI, only show command line output.
   -v, --verbose         Show verbose information.
   -u SEC, --update SEC  The update interval in seconds.
-➜  slush-block-notification git:(master) 
-
 ```
