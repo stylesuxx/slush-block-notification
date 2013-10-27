@@ -24,8 +24,7 @@ optional arguments:
                         notification to be shown as soon as your reward has
                         been calculated by the pool.
   --nogui               No GUI, only show command line output.
-  -e email, --email email
-                        Provide an email.
+  -e EML, --email EML   Provide an email.
   -v, --verbose         Show verbose information.
   -u SEC, --update SEC  The update interval in seconds.
 ```
