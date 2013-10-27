@@ -16,7 +16,7 @@ If you want to use the email functionality you will need a local SMTP server. Ch
 
 ##### Usage
 ```
-usage: sbn.py [-h] [-r] [--nogui] [-e email] [-v] [-u SEC] API_TOKEN
+usage: sbn.py [-h] [-r] [--nogui] [-e EML] [-v] [-u SEC] API_TOKEN
 
 Display notifications about newly found blocks on slush's pool.
 
@@ -30,7 +30,7 @@ optional arguments:
                         notification to be shown as soon as your reward has
                         been calculated by the pool.
   --nogui               No GUI, only show command line output.
-  -e EML, --email EML   Provide an email.
+  -e EML, --email EML   Provide an email for email notification.
   -v, --verbose         Show verbose information.
   -u SEC, --update SEC  The update interval in seconds.
 ```

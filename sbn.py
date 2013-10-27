@@ -13,11 +13,11 @@ def sendmail(sender, to, subject, body):
     msg['From'] = sender
     msg['To'] = to
 
-    s = smtplib.SMTP('localhost')
+    s = smtplib.SMTP('127.0.0.1')
     s.sendmail(sender, [to], msg.as_string())
     s.quit()
   except Exception, e:
-    sys.exit( "Sending mail failed; %s" % str(e) ) 
+    print 'Sending mail failed: %s' % str(e) 
 
 def main(args):
   verbose = args.verbose
@@ -37,10 +37,11 @@ def main(args):
       r.raise_for_status()
       data = r.json()
     except requests.exceptions.ConnectionError, e:
-      print 'Connection Error. Retrying in %i seconds' %update
+      print 'Connection Error. Retrying in %i seconds' % update
       status = -2
     except Exception, e:
-      pass
+      print 'Fetching data failed: %s' % str(e)
+      status = -2
 
     if status == 401:
       print 'Unauthorized, check your token.'
@@ -59,7 +60,7 @@ def main(args):
       if last is None:
         # First block after the program has started.
         # Only need the Block NR for further reference.
-        if verbose: print 'First block for reference: %s' %current
+        if verbose: print 'First block for reference: %s' % current
         last = current
       elif last != current:
         # Set message for newly found block.
@@ -67,19 +68,18 @@ def main(args):
         msg = None
         if show_reward:
           if 'reward' in values:
-            msg = 'Time: %s<br />Duration: %s<br />Reward: %s' %(values['date_found'].split()[1], values['mining_duration'], values['reward'])
+            msg = 'Time: %s<br />Duration: %s<br />Reward: %s' % (values['date_found'].split()[1], values['mining_duration'], values['reward'])
           else:
             if verbose: print 'Waiting for reward to be calculated'
         else:
-          msg = 'Time: %s<br />Duration: %s' %(values['date_found'].split()[1], values['mining_duration'])
+          msg = 'Time: %s<br />Duration: %s' % (values['date_found'].split()[1], values['mining_duration'])
 
         if msg:
-          if verbose: print 'Displaying notification'
           last = current
+          if verbose: print 'Displaying notification'
           if email: sendmail(email, email, 'New Block', msg.replace('<br />','\n'))
           if no_gui: print "#####\n" + msg.replace('<br />','\n')
-          else:
-            pynotify.Notification( 'New Block found', msg).show()
+          else: pynotify.Notification( 'New Block found', msg).show()
 
     time.sleep(update)
 
