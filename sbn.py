@@ -1,12 +1,19 @@
 #!/usr/bin/python
-import sys, signal, argparse, time, requests, pynotify, smtplib
+import sys
+import signal
+import argparse
+import time
+import requests
+
+import pynotify
+import smtplib
 from email.mime.text import MIMEText
 
 def signal_handler(signal, frame):
   print 'Exiting...'
   sys.exit(0)
 
-def sendmail(sender, to, subject, body):
+def send_mail(sender, to, subject, body):
   try:
     msg = MIMEText(body)
     msg['Subject'] = subject
@@ -68,31 +75,47 @@ def main(args):
         msg = None
         if show_reward:
           if 'reward' in values:
-            msg = 'Time: %s<br />Duration: %s<br />Reward: %s' % (values['date_found'].split()[1], values['mining_duration'], values['reward'])
+            msg = 'Time: %s<br />Duration: %s<br />Reward: %s' % (
+                values['date_found'].split()[1],
+                values['mining_duration'],
+                values['reward'])
           else:
             if verbose: print 'Waiting for reward to be calculated'
         else:
-          msg = 'Time: %s<br />Duration: %s' % (values['date_found'].split()[1], values['mining_duration'])
+          msg = 'Time: %s<br />Duration: %s' % (
+              values['date_found'].split()[1],
+              values['mining_duration'])
 
         if msg:
           last = current
-          if verbose: print 'Displaying notification'
-          if email: sendmail(email, email, 'New Block', msg.replace('<br />','\n'))
-          if no_gui: print "#####\n" + msg.replace('<br />','\n')
-          else: pynotify.Notification( 'New Block found', msg).show()
+          if email:
+            if verbose: 
+              print 'Sending mail.'
+            send_mail(email, email, 'New Block', msg.replace('<br />','\n'))
+          if no_gui: 
+            print "#####\n" + msg.replace('<br />','\n')
+          else: 
+            if verbose: 
+              print 'Displaying desktop notification.'
+            pynotify.Notification( 'New Block found', msg).show()
 
     time.sleep(update)
 
-parser = argparse.ArgumentParser(description='Display notifications about newly found blocks on slush\'s pool.')
+parser = argparse.ArgumentParser(description = 'Display notifications about'
+  ' newly found blocks on slush\'s pool.')
+
 parser.add_argument('token',
                     metavar = 'API_TOKEN',
-                    help = 'Slush pool API token. Can be found on your account page.')
+                    help = 'Slush pool API token. Can be found on your account'
+                           ' page.')
 
 parser.add_argument('-r',
                     '--reward',
                     dest = 'reward',
                     action = 'store_true',
-                    help = 'Show reward per block. This will cause the notification to be shown as soon as your reward has been calculated by the pool.')
+                    help = 'Show reward per block. This will cause the'
+                           ' notification to be shown as soon as your reward'
+                           ' has been calculated by the pool.')
 
 parser.add_argument('--nogui',
                     dest = 'nogui',
