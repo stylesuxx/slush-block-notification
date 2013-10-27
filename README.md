@@ -5,7 +5,7 @@ This should work cross plattform, although I have not tested it on Windows or Ma
 
 ##### Dependencies:
 * python 2.x
-* libs: requests, [py-notify](http://home.gna.org/py-notify/)
+* libs: requests, [notify-python](http://galago-project.org/news/index.php)
 * slush pool API token (available on your account page)
 
 ##### Usage
