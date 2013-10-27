@@ -1,9 +1,23 @@
 #!/usr/bin/python
-import sys, signal, argparse, time, requests, pynotify
+import sys, signal, argparse, time, requests, pynotify, smtplib
+from email.mime.text import MIMEText
 
 def signal_handler(signal, frame):
-        print 'Exiting...'
-        sys.exit(0)
+  print 'Exiting...'
+  sys.exit(0)
+
+def sendmail(sender, to, subject, body):
+  try:
+    msg = MIMEText(body)
+    msg['Subject'] = subject
+    msg['From'] = sender
+    msg['To'] = to
+
+    s = smtplib.SMTP('localhost')
+    s.sendmail(sender, [to], msg.as_string())
+    s.quit()
+  except Exception, e:
+    sys.exit( "Sending mail failed; %s" % str(e) ) 
 
 def main(args):
   verbose = args.verbose
@@ -11,6 +25,7 @@ def main(args):
   show_reward = args.reward
   no_gui = args.nogui
   update = args.update
+  email = args.email
   url = 'http://mining.bitcoin.cz/stats/json/' + token
   last = None
   pynotify.init('SlushBlockNotify')
@@ -45,6 +60,7 @@ def main(args):
         # First block after the program has started.
         # Only need the Block NR for further reference.
         if verbose: print 'First block for reference: %s' %current
+        last = current
       elif last != current:
         # Set message for newly found block.
         # This depends on the passed flags via cmd.
@@ -60,6 +76,7 @@ def main(args):
         if msg:
           if verbose: print 'Displaying notification'
           last = current
+          if email: sendmail(email, email, 'New Block', msg.replace('<br />','\n'))
           if no_gui: print "#####\n" + msg.replace('<br />','\n')
           else:
             pynotify.Notification( 'New Block found', msg).show()
@@ -81,6 +98,12 @@ parser.add_argument('--nogui',
                     dest = 'nogui',
                     action = 'store_true',
                     help = 'No GUI, only show command line output.')
+
+parser.add_argument('-e',
+                    '--email',
+                    metavar = 'email',
+                    default = None,
+                    help = 'Provide an email.')
 
 parser.add_argument('-v',
                     '--verbose',
