@@ -1,12 +1,18 @@
 #### Slush's pool block notification
-Get a system notification when a new block was found in slushs pool. Also displays some additional information like duration and your your reward for that block. Slushs pool is queried every 90 seconds by default since API calls are cached for 60 seconds and we do not want to flood the server. Update interval may be adjusted via argument.
-
-This should work cross plattform, although I have not tested it on Windows or Mac. Maybe someone could confirm that?
+Get a notification when a new block was found in slushs pool. Also displays some additional information like duration and your your reward for that block. Slushs pool is queried every 90 seconds by default since API calls are cached for 60 seconds and we do not want to flood the server. Update interval may be adjusted via argument.
 
 ##### Dependencies:
 * python 2.x
 * libs: requests, [notify-python](http://galago-project.org/news/index.php)
 * slush pool API token (available on your account page)
+
+##### Possible Notifications
+* Desktop
+* Command line only
+* E-Mail
+
+##### E-Mail
+If you want to use the email functionality you will need a local SMTP server. Check your spam folder for the notifications and make a rule to filter them.
 
 ##### Usage
 ```
