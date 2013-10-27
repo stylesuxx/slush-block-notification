@@ -9,6 +9,7 @@ def main(args):
   verbose = args.verbose
   token = args.token
   show_reward = args.reward
+  no_gui = args.nogui
   update = args.update
   url = 'http://mining.bitcoin.cz/stats/json/' + token
   last = None
@@ -44,7 +45,6 @@ def main(args):
         # First block after the program has started.
         # Only need the Block NR for further reference.
         if verbose: print 'First block for reference: %s' %current
-        last = current
       elif last != current:
         # Set message for newly found block.
         # This depends on the passed flags via cmd.
@@ -60,7 +60,9 @@ def main(args):
         if msg:
           if verbose: print 'Displaying notification'
           last = current
-          pynotify.Notification( 'New Block found', msg).show()
+          if no_gui: print "#####\n" + msg.replace('<br />','\n')
+          else:
+            pynotify.Notification( 'New Block found', msg).show()
 
     time.sleep(update)
 
@@ -74,6 +76,11 @@ parser.add_argument('-r',
                     dest = 'reward',
                     action = 'store_true',
                     help = 'Show reward per block. This will cause the notification to be shown as soon as your reward has been calculated by the pool.')
+
+parser.add_argument('--nogui',
+                    dest = 'nogui',
+                    action = 'store_true',
+                    help = 'No GUI, only show command line output.')
 
 parser.add_argument('-v',
                     '--verbose',
