@@ -45,6 +45,7 @@ def main(args):
         # First block after the program has started.
         # Only need the Block NR for further reference.
         if verbose: print 'First block for reference: %s' %current
+        last = current
       elif last != current:
         # Set message for newly found block.
         # This depends on the passed flags via cmd.
