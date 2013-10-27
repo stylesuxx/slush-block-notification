@@ -101,9 +101,9 @@ parser.add_argument('--nogui',
 
 parser.add_argument('-e',
                     '--email',
-                    metavar = 'email',
+                    metavar = 'EML',
                     default = None,
-                    help = 'Provide an email.')
+                    help = 'Provide an email for email notification.')
 
 parser.add_argument('-v',
                     '--verbose',
