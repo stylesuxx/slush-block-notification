@@ -10,7 +10,7 @@ This should work cross plattform, although I have not tested it on Windows or Ma
 
 ##### Usage
 ```
-usage: sbn.py [-h] [-r] [-u SEC] API_TOKEN
+usage: sbn.py [-h] [-r] [--nogui] [-v] [-u SEC] API_TOKEN
 
 Display notifications about newly found blocks on slush's pool.
 
@@ -23,5 +23,9 @@ optional arguments:
   -r, --reward          Show reward per block. This will cause the
                         notification to be shown as soon as your reward has
                         been calculated by the pool.
-  -u SEC, --update SEC  The update interval.
+  --nogui               No GUI, only show command line output.
+  -v, --verbose         Show verbose information.
+  -u SEC, --update SEC  The update interval in seconds.
+➜  slush-block-notification git:(master) 
+
 ```
